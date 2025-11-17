@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useRef, useCallback } from "react"
-import { Upload, Camera, Download, Loader2, Check, Info, ChevronLeft, ChevronRight, Heart, Sparkles, Image as ImageIcon } from "lucide-react"
+import { useState, useRef, useCallback, useEffect } from "react"
+import { Upload, Camera, Download, Loader2, Check, Info, ChevronLeft, ChevronRight, Heart, Sparkles, Image as ImageIcon, X } from "lucide-react"
 
 interface GeneratedImage {
   url: string
@@ -24,11 +24,29 @@ export default function HairstyleGenerator() {
   const [error, setError] = useState<string>("")
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [showCamera, setShowCamera] = useState(false)
+  const [showPhotoRequirements, setShowPhotoRequirements] = useState(false)
+  const [dontShowAgain, setDontShowAgain] = useState(false)
+  const [showHoverButtons, setShowHoverButtons] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
+
+  // Check localStorage for photo requirements preference
+  useEffect(() => {
+    const dontShow = localStorage.getItem("hidePhotoRequirements")
+    if (dontShow === "true") {
+      setDontShowAgain(true)
+    }
+  }, [])
+
+  // Save preference when changed
+  useEffect(() => {
+    if (dontShowAgain) {
+      localStorage.setItem("hidePhotoRequirements", "true")
+    }
+  }, [dontShowAgain])
 
   // Style prompts based on gender
   const stylePrompts = {
@@ -213,90 +231,212 @@ export default function HairstyleGenerator() {
         </div>
       )}
 
+      {/* Photo Requirements Modal */}
+      {showPhotoRequirements && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 lg:p-6">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 lg:p-10">
+            {/* Header */}
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#1A1A1A] mb-8 text-center">
+              Photo Guidelines for Best Results
+            </h2>
+
+            {/* Suitable Photos Section */}
+            <div className="mb-10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center">
+                  <Check className="w-4 h-4 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-[#1A1A1A]">Suitable Photos</h3>
+              </div>
+
+              <p className="text-[#666] text-[15px] leading-relaxed mb-6">
+                Please upload a clear, front-facing photo of your face. To create a satisfactory look,
+                it's ideal to pull your hair up or back. And let your hair hang naturally.
+              </p>
+
+              {/* Good Examples Grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="relative rounded-xl overflow-hidden border-2 border-[#E8E8E8] bg-gray-100 aspect-[3/4]">
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <Camera className="w-12 h-12" />
+                    </div>
+                    <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
+                      <Check className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Unsuitable Photos Section */}
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center">
+                  <X className="w-4 h-4 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-[#1A1A1A]">Unsuitable Photos</h3>
+              </div>
+
+              <p className="text-[#666] text-[15px] leading-relaxed mb-6">
+                Please don't upload photos taken from the side, in low light, where your face is
+                covered by hair or any other objects. Also, please avoid cartoon images.
+              </p>
+
+              {/* Bad Examples Grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="relative rounded-xl overflow-hidden border-2 border-[#E8E8E8] bg-gray-100 aspect-[3/4]">
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <Camera className="w-12 h-12" />
+                    </div>
+                    <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-red-500 flex items-center justify-center shadow-lg">
+                      <X className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Don't show again checkbox */}
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <input
+                type="checkbox"
+                id="dontShowAgain"
+                checked={dontShowAgain}
+                onChange={(e) => setDontShowAgain(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-[#C9A961] focus:ring-[#C9A961]"
+              />
+              <label htmlFor="dontShowAgain" className="text-sm text-[#666] cursor-pointer">
+                Don't show again
+              </label>
+            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setShowPhotoRequirements(false)}
+              className="w-48 mx-auto block py-3.5 bg-gradient-to-r from-[#C9A961] to-[#B89651] text-white rounded-lg text-base font-semibold hover:shadow-lg transition-shadow"
+            >
+              OK, Got it
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* LEFT COLUMN - Upload & History */}
         <div className="w-full lg:w-[30%] p-6 lg:p-8 bg-[#FAFAFA] lg:border-r border-b lg:border-b-0 border-[#E8E8E8]">
           {/* Upload Area */}
-          <div
-            className="bg-white border-2 border-dashed border-[#D0D0D0] rounded-xl p-6 lg:p-10 text-center mb-6 min-h-[300px] lg:min-h-[400px] flex flex-col items-center justify-center cursor-pointer hover:border-[#C9A961] transition-colors"
-            onClick={() => !uploadedImage && fileInputRef.current?.click()}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  handleImageUpload(e.target.files[0])
-                }
-              }}
-              className="hidden"
-            />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files?.[0]) {
+                handleImageUpload(e.target.files[0])
+              }
+            }}
+            className="hidden"
+          />
 
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="user"
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  handleImageUpload(e.target.files[0])
-                }
-              }}
-              className="hidden"
-            />
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="user"
+            onChange={(e) => {
+              if (e.target.files?.[0]) {
+                handleImageUpload(e.target.files[0])
+              }
+            }}
+            className="hidden"
+          />
 
-            {isUploading ? (
-              <>
-                <Loader2 className="w-12 h-12 text-[#C9A961] animate-spin mb-4" />
-                <p className="text-[#666] font-medium">Uploading...</p>
-              </>
-            ) : !uploadedImage ? (
-              <>
-                <Upload className="w-12 h-12 text-[#666] mb-4" />
-                <p className="text-[#333] font-medium mb-2">Click to upload or drag and drop</p>
-                <p className="text-sm text-[#999] mb-4">JPG, PNG or WebP (Max 20MB)</p>
+          {isUploading ? (
+            <div className="bg-white border-3 border-dashed border-[#D0D0D0] rounded-xl p-10 lg:p-14 text-center mb-6 min-h-[400px] lg:min-h-[450px] flex flex-col items-center justify-center">
+              <Loader2 className="w-12 h-12 text-[#C9A961] animate-spin mb-4" />
+              <p className="text-[#666] font-medium text-lg">Uploading...</p>
+            </div>
+          ) : !uploadedImage ? (
+            /* Empty State */
+            <div className="bg-white border-[3px] border-dashed border-[#D0D0D0] rounded-xl p-10 lg:p-14 text-center mb-6 min-h-[400px] lg:min-h-[450px] flex flex-col items-center justify-center">
+              {/* Upload Icon with Background */}
+              <div className="w-20 h-20 bg-[#F5F5F5] rounded-full flex items-center justify-center mb-6">
+                <Upload className="w-10 h-10 text-[#999]" />
+              </div>
+
+              {/* Instructions */}
+              <p className="text-base text-[#666] mb-6 leading-relaxed">
+                Click to upload or drag and drop<br />
+                your image here
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 mb-5">
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    startCamera()
-                  }}
-                  className="bg-[#C9A961] text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-[#B89651] transition-colors"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-7 py-3.5 bg-gradient-to-r from-[#C9A961] to-[#B89651] text-white rounded-lg text-base font-semibold hover:shadow-lg transition-shadow"
                 >
-                  <Camera className="w-4 h-4" />
+                  Choose File
+                </button>
+                <button
+                  onClick={startCamera}
+                  className="px-7 py-3.5 bg-white text-[#C9A961] border-2 border-[#C9A961] rounded-lg text-base font-semibold hover:bg-[#C9A961]/5 transition-colors"
+                >
                   Take Photo
                 </button>
-              </>
-            ) : (
+              </div>
+
+              {/* File Requirements */}
+              <p className="text-sm text-[#999] mb-2">
+                Supported Formats: JPG, JPEG, PNG or WebP (20MB)
+              </p>
+
+              {/* Daily Limit */}
+              <p className="text-sm text-[#E91E8C] font-semibold">
+                ( 20 Times Limit Per Day )
+              </p>
+            </div>
+          ) : (
+            /* Uploaded State with Hover Buttons */
+            <div
+              className="relative bg-white rounded-xl overflow-hidden mb-6 group"
+              onMouseEnter={() => setShowHoverButtons(true)}
+              onMouseLeave={() => setShowHoverButtons(false)}
+            >
               <img
                 src={uploadedImage}
                 alt="Uploaded"
-                className="w-full max-h-[350px] object-contain rounded-lg"
+                className="w-full rounded-xl"
               />
-            )}
-          </div>
 
-          {uploadedImage && (
-            <div className="flex gap-2 mb-6">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="flex-1 border border-[#D0D0D0] rounded-lg py-2 text-sm font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
+              {/* Hover Overlay Buttons */}
+              <div
+                className={`absolute inset-0 bg-black/30 flex items-center justify-center gap-3 transition-opacity duration-300 ${
+                  showHoverButtons ? "opacity-100" : "opacity-0"
+                }`}
               >
-                <Upload className="w-4 h-4" />
-                Upload New
-              </button>
-              <button
-                onClick={startCamera}
-                className="flex-1 border border-[#D0D0D0] rounded-lg py-2 text-sm font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
-              >
-                <Camera className="w-4 h-4" />
-                Retake
-              </button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-6 py-3 bg-white/95 text-[#C9A961] border-2 border-[#C9A961] rounded-lg text-sm font-semibold shadow-lg hover:bg-white transition-colors"
+                >
+                  Re-upload
+                </button>
+                <button
+                  onClick={startCamera}
+                  className="px-6 py-3 bg-white/95 text-[#C9A961] border-2 border-[#C9A961] rounded-lg text-sm font-semibold shadow-lg hover:bg-white transition-colors"
+                >
+                  Take Photo
+                </button>
+              </div>
             </div>
           )}
 
           {/* Photo Requirements */}
-          <button className="flex items-center gap-2 text-[#666] text-sm mb-6 hover:text-[#333]">
+          <button
+            onClick={() => setShowPhotoRequirements(true)}
+            className="flex items-center gap-2 text-[#666] text-sm mb-6 hover:text-[#333] transition-colors"
+          >
             <Info className="w-4 h-4" />
             Photo Requirements
           </button>
