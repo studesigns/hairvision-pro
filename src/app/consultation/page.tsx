@@ -68,13 +68,25 @@ export default function ConsultationPage() {
     setError("")
 
     try {
-      // For now, we'll use the uploaded image directly
-      // In production, this would call the Replicate API with proper image hosting
+      // Step 1: Upload image to Supabase Storage to get a URL
+      const uploadResponse = await fetch("/api/upload-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageData: clientPhoto }),
+      })
+
+      const uploadResult = await uploadResponse.json()
+
+      if (!uploadResult.success) {
+        throw new Error(uploadResult.error || "Failed to upload image")
+      }
+
+      // Step 2: Call Replicate API with the hosted URL
       const response = await fetch("/api/transform-hair", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          imageUrl: clientPhoto, // This would need to be a hosted URL for Replicate
+          imageUrl: uploadResult.imageUrl,
           hairColor: selectedColor.name,
           hairStyle: styleNotes || "healthy, shiny, natural looking",
         }),
