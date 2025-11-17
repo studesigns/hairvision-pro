@@ -30,10 +30,13 @@ export async function GET(request: Request) {
 
     // Apply sorting
     if (sortBy === "popularity") {
-      query = query.order("popularity", { ascending: false })
+      query = query.order("popularity", { ascending: false, nullsFirst: false })
     } else if (sortBy === "name") {
       query = query.order("name", { ascending: true })
     } else if (sortBy === "newest") {
+      query = query.order("created_at", { ascending: false })
+    } else {
+      // Default to newest first
       query = query.order("created_at", { ascending: false })
     }
 
