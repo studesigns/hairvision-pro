@@ -32,6 +32,7 @@ export default function HairstyleGenerator() {
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
+  const [pendingCameraOpen, setPendingCameraOpen] = useState(false)
 
   // Check localStorage for photo requirements preference
   useEffect(() => {
@@ -52,6 +53,25 @@ export default function HairstyleGenerator() {
   const stylePrompts = {
     female: "beautiful female hairstyle, elegant, salon quality, professional styling",
     male: "handsome male haircut, well-groomed, barber quality, professional styling"
+  }
+
+  // Handle "Take Photo" button - show requirements first if not dismissed
+  function handleTakePhotoClick() {
+    if (!dontShowAgain) {
+      setPendingCameraOpen(true)
+      setShowPhotoRequirements(true)
+    } else {
+      startCamera()
+    }
+  }
+
+  // Handle closing requirements modal
+  function handleRequirementsClose() {
+    setShowPhotoRequirements(false)
+    if (pendingCameraOpen) {
+      setPendingCameraOpen(false)
+      startCamera()
+    }
   }
 
   async function handleImageUpload(file: File) {
@@ -314,7 +334,7 @@ export default function HairstyleGenerator() {
 
             {/* Close Button */}
             <button
-              onClick={() => setShowPhotoRequirements(false)}
+              onClick={handleRequirementsClose}
               className="w-48 mx-auto block py-3.5 bg-gradient-to-r from-[#C9A961] to-[#B89651] text-white rounded-lg text-base font-semibold hover:shadow-lg transition-shadow"
             >
               OK, Got it
@@ -323,9 +343,9 @@ export default function HairstyleGenerator() {
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row min-h-screen">
+      <div className="flex flex-col lg:flex-row h-screen overflow-hidden">
         {/* LEFT COLUMN - Upload & History */}
-        <div className="w-full lg:w-[30%] p-6 lg:p-8 bg-[#FAFAFA] lg:border-r border-b lg:border-b-0 border-[#E8E8E8]">
+        <div className="w-full lg:w-[30%] p-4 lg:p-6 bg-[#FAFAFA] lg:border-r border-b lg:border-b-0 border-[#E8E8E8] flex flex-col lg:h-screen lg:overflow-y-auto">
           {/* Upload Area */}
           <input
             ref={fileInputRef}
@@ -353,61 +373,61 @@ export default function HairstyleGenerator() {
           />
 
           {isUploading ? (
-            <div className="bg-white border-3 border-dashed border-[#D0D0D0] rounded-xl p-10 lg:p-14 text-center mb-6 min-h-[400px] lg:min-h-[450px] flex flex-col items-center justify-center">
-              <Loader2 className="w-12 h-12 text-[#C9A961] animate-spin mb-4" />
-              <p className="text-[#666] font-medium text-lg">Uploading...</p>
+            <div className="bg-white border-3 border-dashed border-[#D0D0D0] rounded-xl p-6 lg:p-8 text-center mb-4 min-h-[280px] lg:min-h-[320px] flex flex-col items-center justify-center">
+              <Loader2 className="w-10 h-10 text-[#C9A961] animate-spin mb-3" />
+              <p className="text-[#666] font-medium">Uploading...</p>
             </div>
           ) : !uploadedImage ? (
             /* Empty State */
-            <div className="bg-white border-[3px] border-dashed border-[#D0D0D0] rounded-xl p-10 lg:p-14 text-center mb-6 min-h-[400px] lg:min-h-[450px] flex flex-col items-center justify-center">
+            <div className="bg-white border-[3px] border-dashed border-[#D0D0D0] rounded-xl p-6 lg:p-8 text-center mb-4 min-h-[280px] lg:min-h-[320px] flex flex-col items-center justify-center">
               {/* Upload Icon with Background */}
-              <div className="w-20 h-20 bg-[#F5F5F5] rounded-full flex items-center justify-center mb-6">
-                <Upload className="w-10 h-10 text-[#999]" />
+              <div className="w-16 h-16 bg-[#F5F5F5] rounded-full flex items-center justify-center mb-4">
+                <Upload className="w-8 h-8 text-[#999]" />
               </div>
 
               {/* Instructions */}
-              <p className="text-base text-[#666] mb-6 leading-relaxed">
+              <p className="text-sm text-[#666] mb-4 leading-relaxed">
                 Click to upload or drag and drop<br />
                 your image here
               </p>
 
               {/* Action Buttons */}
-              <div className="flex gap-3 mb-5">
+              <div className="flex gap-2 mb-3">
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-7 py-3.5 bg-gradient-to-r from-[#C9A961] to-[#B89651] text-white rounded-lg text-base font-semibold hover:shadow-lg transition-shadow"
+                  className="px-5 py-2.5 bg-gradient-to-r from-[#C9A961] to-[#B89651] text-white rounded-lg text-sm font-semibold hover:shadow-lg transition-shadow"
                 >
                   Choose File
                 </button>
                 <button
-                  onClick={startCamera}
-                  className="px-7 py-3.5 bg-white text-[#C9A961] border-2 border-[#C9A961] rounded-lg text-base font-semibold hover:bg-[#C9A961]/5 transition-colors"
+                  onClick={handleTakePhotoClick}
+                  className="px-5 py-2.5 bg-white text-[#C9A961] border-2 border-[#C9A961] rounded-lg text-sm font-semibold hover:bg-[#C9A961]/5 transition-colors"
                 >
                   Take Photo
                 </button>
               </div>
 
               {/* File Requirements */}
-              <p className="text-sm text-[#999] mb-2">
-                Supported Formats: JPG, JPEG, PNG or WebP (20MB)
+              <p className="text-xs text-[#999] mb-1">
+                JPG, PNG or WebP (Max 20MB)
               </p>
 
               {/* Daily Limit */}
-              <p className="text-sm text-[#E91E8C] font-semibold">
+              <p className="text-xs text-[#E91E8C] font-semibold">
                 ( 20 Times Limit Per Day )
               </p>
             </div>
           ) : (
             /* Uploaded State with Hover Buttons */
             <div
-              className="relative bg-white rounded-xl overflow-hidden mb-6 group"
+              className="relative bg-white rounded-xl overflow-hidden mb-4 group"
               onMouseEnter={() => setShowHoverButtons(true)}
               onMouseLeave={() => setShowHoverButtons(false)}
             >
               <img
                 src={uploadedImage}
                 alt="Uploaded"
-                className="w-full rounded-xl"
+                className="w-full max-h-[280px] object-contain rounded-xl"
               />
 
               {/* Hover Overlay Buttons */}
@@ -423,7 +443,7 @@ export default function HairstyleGenerator() {
                   Re-upload
                 </button>
                 <button
-                  onClick={startCamera}
+                  onClick={handleTakePhotoClick}
                   className="px-6 py-3 bg-white/95 text-[#C9A961] border-2 border-[#C9A961] rounded-lg text-sm font-semibold shadow-lg hover:bg-white transition-colors"
                 >
                   Take Photo
@@ -435,7 +455,7 @@ export default function HairstyleGenerator() {
           {/* Photo Requirements */}
           <button
             onClick={() => setShowPhotoRequirements(true)}
-            className="flex items-center gap-2 text-[#666] text-sm mb-6 hover:text-[#333] transition-colors"
+            className="flex items-center gap-2 text-[#666] text-sm mb-4 hover:text-[#333] transition-colors"
           >
             <Info className="w-4 h-4" />
             Photo Requirements
@@ -443,8 +463,8 @@ export default function HairstyleGenerator() {
 
           {/* History Section */}
           <div>
-            <h4 className="text-sm font-semibold text-[#666] mb-4">History</h4>
-            <div className="grid grid-cols-3 lg:grid-cols-3 gap-3">
+            <h4 className="text-sm font-semibold text-[#666] mb-3">History</h4>
+            <div className="grid grid-cols-3 gap-2">
               {/* Current photo */}
               {uploadedImage && (
                 <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-[#C9A961]">
@@ -470,36 +490,36 @@ export default function HairstyleGenerator() {
         </div>
 
         {/* RIGHT COLUMN - Gender & Results */}
-        <div className="w-full lg:w-[70%] p-6 lg:p-8 xl:p-12 bg-white">
+        <div className="w-full lg:w-[70%] p-4 lg:p-6 bg-white flex flex-col lg:h-screen lg:overflow-hidden">
           {/* Instructions */}
-          <p className="text-center text-[#666] text-base lg:text-lg mb-6 lg:mb-8">
+          <p className="text-center text-[#666] text-sm lg:text-base mb-4">
             Upload your photo and try different hairstyles instantly
           </p>
 
           {/* Gender Toggle */}
-          <div className="flex justify-center gap-3 mb-8 lg:mb-12">
+          <div className="flex justify-center gap-3 mb-4 lg:mb-6">
             <button
               onClick={() => setGender("female")}
-              className={`px-8 py-3 rounded-lg text-base font-semibold flex items-center gap-2 transition-all ${
+              className={`px-6 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all ${
                 gender === "female"
                   ? "bg-[#E91E8C] text-white shadow-md"
                   : "bg-white text-[#666] border-2 border-[#E0E0E0] hover:border-[#E91E8C]"
               }`}
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C9.24 2 7 4.24 7 7s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 12c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
               Female
             </button>
             <button
               onClick={() => setGender("male")}
-              className={`px-8 py-3 rounded-lg text-base font-semibold flex items-center gap-2 transition-all ${
+              className={`px-6 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all ${
                 gender === "male"
                   ? "bg-[#4A90E2] text-white shadow-md"
                   : "bg-white text-[#666] border-2 border-[#E0E0E0] hover:border-[#4A90E2]"
               }`}
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C9.24 2 7 4.24 7 7s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 12c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
               Male
@@ -508,28 +528,28 @@ export default function HairstyleGenerator() {
 
           {/* Error Display */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl mb-8">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
               {error}
             </div>
           )}
 
           {/* Results Grid with Navigation */}
-          <div className="relative mb-8">
+          <div className="relative flex-1 mb-4">
             {/* Left Arrow */}
-            <button className="absolute left-0 lg:-left-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-[#E0E0E0] bg-white flex items-center justify-center z-10 hover:shadow-md transition-shadow">
-              <ChevronLeft className="w-6 h-6" />
+            <button className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-[#E0E0E0] bg-white flex items-center justify-center z-10 hover:shadow-md transition-shadow">
+              <ChevronLeft className="w-5 h-5" />
             </button>
 
             {/* Results Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 px-6 lg:px-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 px-10 h-full">
               {generatedImages.length > 0 ? (
-                generatedImages.slice(0, 12).map((image) => (
+                generatedImages.slice(0, 8).map((image) => (
                   <div
                     key={image.id}
                     onClick={() => setSelectedImage(image)}
-                    className={`relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer transition-all hover:scale-[1.02] ${
+                    className={`relative aspect-[3/4] rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.02] ${
                       selectedImage?.id === image.id
-                        ? "ring-4 ring-[#C9A961] shadow-lg"
+                        ? "ring-3 ring-[#C9A961] shadow-lg"
                         : "border border-[#E0E0E0] hover:shadow-md"
                     }`}
                   >
@@ -539,8 +559,8 @@ export default function HairstyleGenerator() {
                       className="w-full h-full object-cover"
                     />
                     {selectedImage?.id === image.id && (
-                      <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[#C9A961] flex items-center justify-center">
-                        <Heart className="w-4 h-4 text-white" fill="white" />
+                      <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#C9A961] flex items-center justify-center">
+                        <Heart className="w-3 h-3 text-white" fill="white" />
                       </div>
                     )}
                     <button
@@ -548,9 +568,9 @@ export default function HairstyleGenerator() {
                         e.stopPropagation()
                         downloadImage(image.url, image.id)
                       }}
-                      className="absolute bottom-2 left-2 right-2 bg-white/90 backdrop-blur-sm py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1 opacity-0 hover:opacity-100 transition-opacity"
+                      className="absolute bottom-1.5 left-1.5 right-1.5 bg-white/90 backdrop-blur-sm py-1.5 rounded text-xs font-medium flex items-center justify-center gap-1 opacity-0 hover:opacity-100 transition-opacity"
                     >
-                      <Download className="w-4 h-4" />
+                      <Download className="w-3 h-3" />
                       Save
                     </button>
                   </div>
@@ -560,18 +580,18 @@ export default function HairstyleGenerator() {
                 Array.from({ length: 8 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className="aspect-[3/4] rounded-xl border-2 border-dashed border-[#E0E0E0] flex flex-col items-center justify-center bg-[#FAFAFA]"
+                    className="aspect-[3/4] rounded-lg border-2 border-dashed border-[#E0E0E0] flex flex-col items-center justify-center bg-[#FAFAFA]"
                   >
-                    <ImageIcon className="w-8 h-8 text-[#D0D0D0] mb-2" />
-                    <span className="text-sm text-[#999]">Style {idx + 1}</span>
+                    <ImageIcon className="w-6 h-6 text-[#D0D0D0] mb-1" />
+                    <span className="text-xs text-[#999]">Style {idx + 1}</span>
                   </div>
                 ))
               )}
             </div>
 
             {/* Right Arrow */}
-            <button className="absolute right-0 lg:-right-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-[#E0E0E0] bg-white flex items-center justify-center z-10 hover:shadow-md transition-shadow">
-              <ChevronRight className="w-6 h-6" />
+            <button className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-[#E0E0E0] bg-white flex items-center justify-center z-10 hover:shadow-md transition-shadow">
+              <ChevronRight className="w-5 h-5" />
             </button>
           </div>
 
@@ -579,16 +599,16 @@ export default function HairstyleGenerator() {
           <button
             onClick={generateHairstyles}
             disabled={!uploadedImage || isGenerating}
-            className="w-full py-5 rounded-xl text-lg font-bold flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-[#C9A961] to-[#B89651] text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+            className="w-full py-4 rounded-xl text-base font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-[#C9A961] to-[#B89651] text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5"
           >
-            <Sparkles className="w-6 h-6" />
+            <Sparkles className="w-5 h-5" />
             {isGenerating ? "Generating Hairstyles..." : "Generate New Hairstyles"}
           </button>
 
           {isGenerating && (
-            <div className="text-center mt-4">
-              <div className="inline-block w-8 h-8 border-4 border-[#E8E8E8] border-t-[#C9A961] rounded-full animate-spin" />
-              <p className="text-sm text-[#666] mt-2">This may take 30-60 seconds...</p>
+            <div className="text-center mt-3">
+              <div className="inline-block w-6 h-6 border-3 border-[#E8E8E8] border-t-[#C9A961] rounded-full animate-spin" />
+              <p className="text-xs text-[#666] mt-1">This may take 30-60 seconds...</p>
             </div>
           )}
         </div>
