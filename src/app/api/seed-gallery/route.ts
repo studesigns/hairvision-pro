@@ -126,16 +126,15 @@ export async function POST(request: Request) {
 
     // Optionally clear existing entries
     if (clearFirst) {
-      const { error: deleteError, count } = await supabase
+      const { error: deleteError } = await supabase
         .from("hairstyles")
         .delete()
         .neq("id", "00000000-0000-0000-0000-000000000000")
-        .select("*", { count: "exact" })
 
       if (deleteError) {
         errors.push(`Delete failed: ${deleteError.message}`)
       } else {
-        deletedCount = count || 0
+        deletedCount = -1 // Indicates delete was attempted
       }
     }
 
