@@ -76,16 +76,10 @@ export default function Home() {
                 How It Works
               </Link>
               <Link
-                href="/gallery"
+                href="/studio"
                 className="text-[13px] font-medium uppercase tracking-[0.15em] text-[#1A1A1A] hover:text-[#C9A961] transition-colors"
               >
-                Gallery
-              </Link>
-              <Link
-                href="/generate"
-                className="text-[13px] font-medium uppercase tracking-[0.15em] text-[#1A1A1A] hover:text-[#C9A961] transition-colors"
-              >
-                AI Generate
+                Studio
               </Link>
               <Link
                 href="#contact"
@@ -96,7 +90,7 @@ export default function Home() {
             </nav>
 
             <Link
-              href="/consultation"
+              href="/studio"
               className="hidden md:inline-flex btn-primary items-center gap-2"
             >
               Start Consultation
