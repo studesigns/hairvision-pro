@@ -1,17 +1,24 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Montserrat, Great_Vibes } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
+const greatVibes = Great_Vibes({
+  variable: "--font-script",
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Ha-Ha | Professional Hair Consultation",
-  description: "Visualize hair transformations and calculate precise color formulas for your salon clients",
+  title: "Hair Architect | Studio and Training - Ryde, Isle of Wight",
+  description: "Professional consultation technology for Hair Architect salon. Visualize transformations and calculate precise color formulas.",
 };
 
 export default function RootLayout({
@@ -21,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased`}>
+      <body className={`${montserrat.variable} ${greatVibes.variable} antialiased`}>
         {children}
       </body>
     </html>

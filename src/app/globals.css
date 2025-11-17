@@ -1,31 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  /* Sophisticated Neutral Palette */
+  /* Hair Architect Color Palette */
   --background: #FAFAFA;
   --foreground: #1A1A1A;
 
-  /* Primary Accent - Muted Purple/Mauve */
-  --primary: #5D4E6D;
-  --primary-light: #8B7A9E;
-  --primary-dark: #3D3247;
+  /* Primary Accent - Champagne Gold */
+  --primary: #C9A961;
+  --primary-light: #D4BC7F;
+  --primary-dark: #B89651;
 
-  /* Secondary Accent - Warm Taupe */
-  --secondary: #A69080;
-  --secondary-light: #C4B5A5;
-  --secondary-dark: #7A6655;
+  /* Secondary Accent - Soft Grey */
+  --secondary: #666666;
+  --secondary-light: #999999;
+  --secondary-dark: #333333;
 
   /* Neutrals */
   --neutral-50: #FAFAFA;
   --neutral-100: #F5F5F5;
-  --neutral-200: #E5E5E5;
+  --neutral-200: #E8E8E8;
   --neutral-300: #D4D4D4;
   --neutral-400: #A3A3A3;
   --neutral-500: #737373;
-  --neutral-600: #525252;
+  --neutral-600: #666666;
   --neutral-700: #404040;
   --neutral-800: #262626;
-  --neutral-900: #171717;
+  --neutral-900: #1A1A1A;
 
   /* Spacing System (8px base) */
   --space-1: 0.5rem;   /* 8px */
@@ -43,8 +43,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-inter);
+  --font-sans: var(--font-montserrat);
+  --font-mono: var(--font-montserrat);
 }
 
 /* Typography Scale */
@@ -57,51 +57,59 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-montserrat), 'Montserrat', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
   line-height: 1.6;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
-/* Sophisticated Button Styles */
+/* Script Font for Accent Text */
+.font-script {
+  font-family: var(--font-script), 'Great Vibes', cursive;
+}
+
+/* Hair Architect Button Styles */
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: white;
-  padding: var(--space-2) var(--space-4);
-  border-radius: 0.5rem;
-  font-weight: 500;
-  letter-spacing: 0.025em;
-  box-shadow: 0 4px 12px rgba(93, 78, 109, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #C9A961 0%, #B89651 100%);
+  color: #FFFFFF;
+  padding: 18px 40px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(201, 169, 97, 0.3);
+  transition: all 0.3s ease;
   border: none;
   cursor: pointer;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(93, 78, 109, 0.4);
-  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+  box-shadow: 0 6px 20px rgba(201, 169, 97, 0.4);
 }
 
 .btn-primary:active {
   transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(93, 78, 109, 0.3);
+  box-shadow: 0 4px 12px rgba(201, 169, 97, 0.3);
 }
 
 .btn-secondary {
   background: transparent;
-  color: var(--primary);
-  padding: var(--space-2) var(--space-4);
-  border-radius: 0.5rem;
-  font-weight: 500;
-  letter-spacing: 0.025em;
-  border: 1.5px solid var(--neutral-300);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #C9A961;
+  padding: 18px 40px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 2px solid #C9A961;
+  transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .btn-secondary:hover {
-  border-color: var(--primary);
-  background: rgba(93, 78, 109, 0.05);
+  background: #C9A961;
+  color: #FFFFFF;
 }
 
 /* Glassmorphism Styles */
@@ -113,10 +121,8 @@ body {
 }
 
 .glass-nav {
-  background: rgba(250, 250, 250, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 /* Micro-interactions */
