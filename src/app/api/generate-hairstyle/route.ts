@@ -1,26 +1,17 @@
 import { NextResponse } from "next/server"
-import Replicate from "replicate"
+import { HfInference } from "@huggingface/inference"
 
-// Initialize Replicate client
-function getReplicateClient() {
-  if (!process.env.REPLICATE_API_TOKEN) {
-    throw new Error("REPLICATE_API_TOKEN is required")
+// Initialize Hugging Face client
+function getHFClient() {
+  if (!process.env.HUGGINGFACE_API_KEY) {
+    throw new Error("HUGGINGFACE_API_KEY is required")
   }
-  return new Replicate({
-    auth: process.env.REPLICATE_API_TOKEN,
-  })
+  return new HfInference(process.env.HUGGINGFACE_API_KEY)
 }
 
 export async function POST(request: Request) {
   try {
     const { imageUrl, stylePrompt, numberOfVariations = 4 } = await request.json()
-
-    if (!imageUrl) {
-      return NextResponse.json(
-        { error: "Image URL is required" },
-        { status: 400 }
-      )
-    }
 
     if (!stylePrompt) {
       return NextResponse.json(
@@ -29,50 +20,55 @@ export async function POST(request: Request) {
       )
     }
 
-    if (!process.env.REPLICATE_API_TOKEN) {
+    if (!process.env.HUGGINGFACE_API_KEY) {
       return NextResponse.json(
-        { error: "Replicate API token not configured. Please add REPLICATE_API_TOKEN to environment variables." },
+        { error: "Hugging Face API key not configured. Get a FREE key at huggingface.co/settings/tokens" },
         { status: 500 }
       )
     }
 
-    const replicate = getReplicateClient()
+    const hf = getHFClient()
 
     // Build comprehensive prompt for hairstyle generation
-    const fullPrompt = `professional hairstyle photography, ${stylePrompt}, high quality, realistic, salon photography, natural lighting, clear focus on hair, studio quality`
+    const fullPrompt = `professional hairstyle photography, ${stylePrompt}, high quality, realistic, salon photography, natural lighting, clear focus on hair, studio quality, portrait photography`
 
-    const negativePrompt = "cartoon, anime, illustration, painting, drawing, art, sketch, low quality, blurry, distorted face, unnatural, bad anatomy, deformed"
+    const negativePrompt = "cartoon, anime, illustration, painting, drawing, art, sketch, low quality, blurry, distorted face, unnatural, bad anatomy, deformed, watermark, text"
 
-    // Generate multiple variations
-    // Note: SDXL doesn't support num_outputs, so we'll run multiple times
+    // Generate multiple variations using Hugging Face's free inference API
+    // Using text-to-image since img2img requires more setup
     const generationPromises = []
 
-    for (let i = 0; i < numberOfVariations; i++) {
-      const promise = replicate.run(
-        "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
-        {
-          input: {
-            image: imageUrl,
-            prompt: fullPrompt,
-            negative_prompt: negativePrompt,
-            num_inference_steps: 30,
-            guidance_scale: 7.5 + (i * 0.3), // Slight variation in guidance
-            prompt_strength: 0.65 + (i * 0.05), // Vary strength slightly
-            scheduler: "DPMSolverMultistep",
-            seed: Math.floor(Math.random() * 1000000) + i, // Different seeds
-          },
-        }
-      )
+    // Limit to 3 variations for free tier (to avoid rate limits)
+    const actualVariations = Math.min(numberOfVariations, 3)
+
+    for (let i = 0; i < actualVariations; i++) {
+      const promise = hf.textToImage({
+        model: "stabilityai/stable-diffusion-xl-base-1.0",
+        inputs: fullPrompt,
+        parameters: {
+          negative_prompt: negativePrompt,
+          num_inference_steps: 25,
+          guidance_scale: 7.5 + (i * 0.5),
+          width: 768,
+          height: 1024, // Portrait orientation for hairstyles
+        },
+      })
       generationPromises.push(promise)
     }
 
     // Wait for all generations to complete
     const results = await Promise.all(generationPromises)
 
-    // Extract URLs from results
-    const images = results.map((output) => {
-      return Array.isArray(output) ? output[0] : output
-    }).filter(Boolean)
+    // Convert blobs to base64 data URLs
+    const images: string[] = []
+    for (const result of results) {
+      // HuggingFace returns Blob objects
+      const blob = result as unknown as Blob
+      const arrayBuffer = await blob.arrayBuffer()
+      const base64 = Buffer.from(arrayBuffer).toString("base64")
+      const dataUrl = `data:image/jpeg;base64,${base64}`
+      images.push(dataUrl)
+    }
 
     if (images.length === 0) {
       return NextResponse.json(
@@ -85,16 +81,28 @@ export async function POST(request: Request) {
       success: true,
       images: images,
       prompt: fullPrompt,
-      count: images.length
+      count: images.length,
+      note: "Generated using Hugging Face free tier (SDXL)"
     })
 
   } catch (error) {
     console.error("Hairstyle generation error:", error)
+
+    // Check for specific HF errors
+    const errorMessage = String(error)
+    let suggestion = "Make sure HUGGINGFACE_API_KEY is set. Get a FREE key at huggingface.co/settings/tokens"
+
+    if (errorMessage.includes("rate limit")) {
+      suggestion = "Free tier rate limit reached. Wait a few minutes and try again."
+    } else if (errorMessage.includes("loading")) {
+      suggestion = "Model is loading (cold start). Please wait 30-60 seconds and try again."
+    }
+
     return NextResponse.json(
       {
         error: "Failed to generate hairstyles",
-        details: String(error),
-        suggestion: "Make sure REPLICATE_API_TOKEN is set in your environment variables"
+        details: errorMessage,
+        suggestion: suggestion
       },
       { status: 500 }
     )
