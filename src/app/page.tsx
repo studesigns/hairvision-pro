@@ -82,6 +82,12 @@ export default function Home() {
                 Gallery
               </Link>
               <Link
+                href="/generate"
+                className="text-[13px] font-medium uppercase tracking-[0.15em] text-[#1A1A1A] hover:text-[#C9A961] transition-colors"
+              >
+                AI Generate
+              </Link>
+              <Link
                 href="#contact"
                 className="text-[13px] font-medium uppercase tracking-[0.15em] text-[#1A1A1A] hover:text-[#C9A961] transition-colors"
               >
