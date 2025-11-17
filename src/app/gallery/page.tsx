@@ -7,19 +7,14 @@ import {
   ArrowLeft,
   Search,
   Grid3X3,
-  List,
+  LayoutList,
   Heart,
-  Sparkles,
   X,
   Loader2,
-  ZoomIn,
   Tag,
-  Palette,
-  Clock
+  Clock,
+  Scissors
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
 
 interface HairstyleItem {
   id: string
@@ -105,290 +100,275 @@ export default function GalleryPage() {
   const getMaintenanceColor = (level: string) => {
     switch (level) {
       case "low":
-        return "bg-green-100 text-green-700"
+        return "bg-emerald-50 text-emerald-700 border-emerald-200"
       case "medium":
-        return "bg-yellow-100 text-yellow-700"
+        return "bg-amber-50 text-amber-700 border-amber-200"
       case "high":
-        return "bg-red-100 text-red-700"
+        return "bg-rose-50 text-rose-700 border-rose-200"
       default:
-        return "bg-gray-100 text-gray-700"
+        return "bg-[var(--neutral-100)] text-[var(--neutral-600)]"
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="gap-2">
+      <header className="glass-nav sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-6">
+              <Link
+                href="/"
+                className="flex items-center gap-2 text-[var(--neutral-600)] hover:text-[var(--primary)] transition-colors"
+              >
                 <ArrowLeft className="w-4 h-4" />
-                Back
-              </Button>
-            </Link>
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-purple-600" />
-              <h1 className="text-xl font-bold">Style Gallery</h1>
+                <span className="text-sm font-medium">Back</span>
+              </Link>
+              <div className="h-6 w-px bg-[var(--neutral-300)]" />
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center">
+                  <Scissors className="w-4 h-4 text-white" />
+                </div>
+                <h1 className="text-lg font-semibold text-[var(--foreground)]">Style Gallery</h1>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant={viewMode === "grid" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setViewMode("grid")}
-            >
-              <Grid3X3 className="w-4 h-4" />
-            </Button>
-            <Button
-              variant={viewMode === "list" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setViewMode("list")}
-            >
-              <List className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-2 rounded-lg transition-colors ${
+                  viewMode === "grid"
+                    ? "bg-[var(--primary)] text-white"
+                    : "bg-[var(--neutral-100)] text-[var(--neutral-600)] hover:bg-[var(--neutral-200)]"
+                }`}
+              >
+                <Grid3X3 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`p-2 rounded-lg transition-colors ${
+                  viewMode === "list"
+                    ? "bg-[var(--primary)] text-white"
+                    : "bg-[var(--neutral-100)] text-[var(--neutral-600)] hover:bg-[var(--neutral-200)]"
+                }`}
+              >
+                <LayoutList className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Filters */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4 space-y-4">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search styles, tags, colors, or descriptions..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Category Filter */}
+      {/* Filters Section */}
+      <section className="border-b border-[var(--neutral-200)] bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Search */}
             <div className="flex-1">
-              <p className="text-xs font-medium text-gray-500 mb-2">Category</p>
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {categories.map((category) => (
-                  <Button
-                    key={category}
-                    variant={selectedCategory === category ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedCategory(category)}
-                    className="whitespace-nowrap"
-                  >
-                    {category}
-                  </Button>
-                ))}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--neutral-400)]" />
+                <input
+                  type="text"
+                  placeholder="Search styles, colors, techniques..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 bg-[var(--neutral-50)] border border-[var(--neutral-200)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
+                />
               </div>
+            </div>
+
+            {/* Category Pills */}
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    selectedCategory === category
+                      ? "bg-[var(--primary)] text-white shadow-md"
+                      : "bg-[var(--neutral-100)] text-[var(--neutral-600)] hover:bg-[var(--neutral-200)]"
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
             </div>
 
             {/* Maintenance Filter */}
-            <div>
-              <p className="text-xs font-medium text-gray-500 mb-2">Maintenance</p>
-              <div className="flex gap-2">
-                {maintenanceLevels.map((level) => (
-                  <Button
-                    key={level}
-                    variant={selectedMaintenance === level ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedMaintenance(level)}
-                    className="capitalize"
-                  >
-                    {level === "all" ? "Any" : level}
-                  </Button>
-                ))}
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-[var(--neutral-600)]">Maintenance:</span>
+              <select
+                value={selectedMaintenance}
+                onChange={(e) => setSelectedMaintenance(e.target.value)}
+                className="px-3 py-2 bg-[var(--neutral-50)] border border-[var(--neutral-200)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+              >
+                <option value="all">All Levels</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Results Count */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
+        <p className="text-sm text-[var(--neutral-600)]">
+          {loading ? "Loading..." : `${filteredStyles.length} styles found`}
+        </p>
       </div>
 
-      {/* Gallery */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-4 flex justify-between items-center">
-          <p className="text-sm text-gray-600">
-            {loading ? "Loading..." : `Showing ${filteredStyles.length} styles`}
-          </p>
-          {favorites.length > 0 && (
-            <p className="text-sm text-purple-600">
-              {favorites.length} favorited
-            </p>
-          )}
-        </div>
-
+      {/* Gallery Grid */}
+      <main className="max-w-7xl mx-auto px-6 lg:px-8 pb-16">
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="w-8 h-8 text-[var(--primary)] animate-spin" />
+          </div>
+        ) : filteredStyles.length === 0 ? (
+          <div className="text-center py-24">
+            <p className="text-[var(--neutral-500)]">No styles found matching your criteria</p>
           </div>
         ) : viewMode === "grid" ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredStyles.map((style) => (
-              <Card
+              <div
                 key={style.id}
-                className="overflow-hidden hover:shadow-lg transition-all group cursor-pointer"
+                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer hover-lift"
                 onClick={() => setSelectedStyle(style)}
               >
-                <div className="relative h-64 bg-gray-100">
-                  {!imageLoadErrors.has(style.id) ? (
-                    <img
+                <div className="relative aspect-[4/5] overflow-hidden">
+                  {imageLoadErrors.has(style.id) ? (
+                    <div className="absolute inset-0 bg-[var(--neutral-100)] flex items-center justify-center">
+                      <span className="text-[var(--neutral-400)] text-sm">Image unavailable</span>
+                    </div>
+                  ) : (
+                    <Image
                       src={style.image_url}
                       alt={style.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
                       onError={() => handleImageError(style.id)}
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100">
-                      <Sparkles className="w-12 h-12 text-purple-300" />
-                    </div>
                   )}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <ZoomIn className="w-8 h-8 text-white" />
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
                       toggleFavorite(style.id)
                     }}
-                    className="absolute top-3 right-3 p-2 rounded-full bg-white/90 hover:bg-white transition-colors shadow-sm"
+                    className="absolute top-3 right-3 p-2 bg-white/90 rounded-full shadow-md hover:bg-white transition-colors"
                   >
                     <Heart
-                      className={cn(
-                        "w-5 h-5",
+                      className={`w-4 h-4 ${
                         favorites.includes(style.id)
-                          ? "fill-red-500 text-red-500"
-                          : "text-gray-400"
-                      )}
+                          ? "fill-rose-500 text-rose-500"
+                          : "text-[var(--neutral-600)]"
+                      }`}
                     />
                   </button>
-                  <div className="absolute bottom-3 left-3 flex gap-2">
-                    <span className="bg-white/90 px-2 py-1 rounded text-xs font-medium">
-                      {style.popularity}% popular
-                    </span>
+                  <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <span
-                      className={cn(
-                        "px-2 py-1 rounded text-xs font-medium capitalize",
-                        getMaintenanceColor(style.maintenance_level)
-                      )}
+                      className={`inline-block px-2 py-1 rounded-md text-xs font-medium border ${getMaintenanceColor(
+                        style.maintenance_level
+                      )}`}
                     >
                       {style.maintenance_level} maintenance
                     </span>
                   </div>
                 </div>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-lg mb-1">{style.name}</h3>
-                  <p className="text-sm text-gray-500 mb-2">
-                    {style.category} • {style.length}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-semibold text-[var(--foreground)]">{style.name}</h3>
+                    <span className="text-xs text-[var(--neutral-500)] bg-[var(--neutral-100)] px-2 py-1 rounded">
+                      {style.category}
+                    </span>
+                  </div>
+                  <p className="text-sm text-[var(--neutral-600)] line-clamp-2 mb-3">
                     {style.description}
                   </p>
                   <div className="flex flex-wrap gap-1">
                     {style.tags.slice(0, 3).map((tag) => (
                       <span
                         key={tag}
-                        className="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-full"
+                        className="text-xs text-[var(--primary)] bg-[var(--primary)]/5 px-2 py-1 rounded"
                       >
                         {tag}
                       </span>
                     ))}
-                    {style.tags.length > 3 && (
-                      <span className="text-xs text-gray-500">
-                        +{style.tags.length - 3} more
-                      </span>
-                    )}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         ) : (
           <div className="space-y-4">
             {filteredStyles.map((style) => (
-              <Card
+              <div
                 key={style.id}
-                className="hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all flex gap-6 cursor-pointer hover-lift"
                 onClick={() => setSelectedStyle(style)}
               >
-                <CardContent className="p-4 flex items-center gap-4">
-                  <div className="w-32 h-32 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
-                    {!imageLoadErrors.has(style.id) ? (
-                      <img
-                        src={style.image_url}
-                        alt={style.name}
-                        className="w-full h-full object-cover"
-                        onError={() => handleImageError(style.id)}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100">
-                        <Sparkles className="w-8 h-8 text-purple-300" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-semibold text-lg">{style.name}</h3>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          toggleFavorite(style.id)
-                        }}
-                      >
-                        <Heart
-                          className={cn(
-                            "w-5 h-5",
-                            favorites.includes(style.id)
-                              ? "fill-red-500 text-red-500"
-                              : "text-gray-400"
-                          )}
-                        />
-                      </button>
+                <div className="relative w-32 h-40 rounded-lg overflow-hidden flex-shrink-0">
+                  {imageLoadErrors.has(style.id) ? (
+                    <div className="absolute inset-0 bg-[var(--neutral-100)] flex items-center justify-center">
+                      <span className="text-[var(--neutral-400)] text-xs">No image</span>
                     </div>
-                    <p className="text-sm text-gray-500 mb-2">
-                      {style.category} • {style.length} • {style.popularity}% popular
-                    </p>
-                    <p className="text-sm text-gray-600 mb-2">{style.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      <span
-                        className={cn(
-                          "text-xs px-2 py-1 rounded capitalize",
-                          getMaintenanceColor(style.maintenance_level)
-                        )}
-                      >
-                        {style.maintenance_level} maintenance
-                      </span>
+                  ) : (
+                    <Image
+                      src={style.image_url}
+                      alt={style.name}
+                      fill
+                      className="object-cover"
+                      onError={() => handleImageError(style.id)}
+                    />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="text-lg font-semibold text-[var(--foreground)]">{style.name}</h3>
+                      <span className="text-sm text-[var(--neutral-500)]">{style.category}</span>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        toggleFavorite(style.id)
+                      }}
+                      className="p-2 rounded-full hover:bg-[var(--neutral-100)] transition-colors"
+                    >
+                      <Heart
+                        className={`w-5 h-5 ${
+                          favorites.includes(style.id)
+                            ? "fill-rose-500 text-rose-500"
+                            : "text-[var(--neutral-400)]"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <p className="text-sm text-[var(--neutral-600)] mb-3">{style.description}</p>
+                  <div className="flex items-center gap-4">
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium border ${getMaintenanceColor(
+                        style.maintenance_level
+                      )}`}
+                    >
+                      <Clock className="w-3 h-3 inline-block mr-1" />
+                      {style.maintenance_level} maintenance
+                    </span>
+                    <div className="flex gap-1">
                       {style.tags.slice(0, 4).map((tag) => (
                         <span
                           key={tag}
-                          className="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-full"
+                          className="text-xs text-[var(--primary)] bg-[var(--primary)]/5 px-2 py-1 rounded"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
-          </div>
-        )}
-
-        {!loading && filteredStyles.length === 0 && (
-          <div className="text-center py-12">
-            <Sparkles className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 mb-4">No styles found matching your criteria.</p>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSearchQuery("")
-                setSelectedCategory("All")
-                setSelectedMaintenance("all")
-              }}
-            >
-              Clear Filters
-            </Button>
           </div>
         )}
       </main>
@@ -396,75 +376,62 @@ export default function GalleryPage() {
       {/* Detail Modal */}
       {selectedStyle && (
         <div
-          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedStyle(null)}
         >
           <div
-            className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+            className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex flex-col md:flex-row h-full">
-              {/* Image */}
-              <div className="md:w-1/2 relative bg-gray-100">
-                <img
-                  src={selectedStyle.image_url}
-                  alt={selectedStyle.name}
-                  className="w-full h-64 md:h-full object-cover"
-                />
-                <button
-                  onClick={() => setSelectedStyle(null)}
-                  className="absolute top-4 right-4 p-2 bg-white/90 rounded-full hover:bg-white"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+            <div className="grid md:grid-cols-2 h-full">
+              <div className="relative aspect-[4/5] md:aspect-auto">
+                {imageLoadErrors.has(selectedStyle.id) ? (
+                  <div className="absolute inset-0 bg-[var(--neutral-100)] flex items-center justify-center">
+                    <span className="text-[var(--neutral-400)]">Image unavailable</span>
+                  </div>
+                ) : (
+                  <Image
+                    src={selectedStyle.image_url}
+                    alt={selectedStyle.name}
+                    fill
+                    className="object-cover"
+                    onError={() => handleImageError(selectedStyle.id)}
+                  />
+                )}
               </div>
-
-              {/* Details */}
-              <div className="md:w-1/2 p-6 overflow-y-auto">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold">{selectedStyle.name}</h2>
-                  <button onClick={() => toggleFavorite(selectedStyle.id)}>
-                    <Heart
-                      className={cn(
-                        "w-6 h-6",
-                        favorites.includes(selectedStyle.id)
-                          ? "fill-red-500 text-red-500"
-                          : "text-gray-400"
-                      )}
-                    />
+              <div className="p-8 overflow-y-auto">
+                <div className="flex items-start justify-between mb-6">
+                  <div>
+                    <span className="text-sm text-[var(--primary)] font-medium">
+                      {selectedStyle.category}
+                    </span>
+                    <h2 className="text-2xl font-semibold text-[var(--foreground)] mt-1">
+                      {selectedStyle.name}
+                    </h2>
+                  </div>
+                  <button
+                    onClick={() => setSelectedStyle(null)}
+                    className="p-2 rounded-full hover:bg-[var(--neutral-100)] transition-colors"
+                  >
+                    <X className="w-5 h-5 text-[var(--neutral-600)]" />
                   </button>
                 </div>
 
-                <div className="flex gap-2 mb-4">
-                  <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
-                    {selectedStyle.category}
-                  </span>
-                  <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                    {selectedStyle.length}
-                  </span>
-                  <span
-                    className={cn(
-                      "px-3 py-1 rounded-full text-sm capitalize",
-                      getMaintenanceColor(selectedStyle.maintenance_level)
-                    )}
-                  >
-                    {selectedStyle.maintenance_level} maintenance
-                  </span>
-                </div>
+                <p className="text-[var(--neutral-600)] leading-relaxed mb-6">
+                  {selectedStyle.description}
+                </p>
 
-                <p className="text-gray-700 mb-6">{selectedStyle.description}</p>
-
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                    <h4 className="text-sm font-semibold text-[var(--foreground)] mb-3 flex items-center gap-2">
                       <Tag className="w-4 h-4" />
                       Style Tags
-                    </div>
+                    </h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedStyle.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="bg-purple-50 text-purple-700 px-3 py-1 rounded-full text-sm"
+                          className="px-3 py-1.5 bg-[var(--neutral-100)] text-[var(--neutral-700)] rounded-full text-sm"
                         >
                           {tag}
                         </span>
@@ -473,15 +440,14 @@ export default function GalleryPage() {
                   </div>
 
                   <div>
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                      <Palette className="w-4 h-4" />
-                      Color Tags
-                    </div>
+                    <h4 className="text-sm font-semibold text-[var(--foreground)] mb-3">
+                      Color Characteristics
+                    </h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedStyle.color_tags.map((tag) => (
                         <span
                           key={tag}
-                          className="bg-pink-50 text-pink-700 px-3 py-1 rounded-full text-sm"
+                          className="px-3 py-1.5 bg-[var(--secondary)]/10 text-[var(--secondary-dark)] rounded-full text-sm"
                         >
                           {tag}
                         </span>
@@ -489,31 +455,72 @@ export default function GalleryPage() {
                     </div>
                   </div>
 
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2">Best For</p>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <p className="text-gray-500">Face Shapes:</p>
-                        <p className="capitalize">{selectedStyle.face_shapes.join(", ")}</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="text-sm font-semibold text-[var(--foreground)] mb-2">
+                        Best Face Shapes
+                      </h4>
+                      <div className="flex flex-wrap gap-1">
+                        {selectedStyle.face_shapes.map((shape) => (
+                          <span
+                            key={shape}
+                            className="text-xs text-[var(--neutral-600)] bg-[var(--neutral-100)] px-2 py-1 rounded"
+                          >
+                            {shape}
+                          </span>
+                        ))}
                       </div>
-                      <div>
-                        <p className="text-gray-500">Hair Textures:</p>
-                        <p className="capitalize">{selectedStyle.hair_textures.join(", ")}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-[var(--foreground)] mb-2">
+                        Hair Textures
+                      </h4>
+                      <div className="flex flex-wrap gap-1">
+                        {selectedStyle.hair_textures.map((texture) => (
+                          <span
+                            key={texture}
+                            className="text-xs text-[var(--neutral-600)] bg-[var(--neutral-100)] px-2 py-1 rounded"
+                          >
+                            {texture}
+                          </span>
+                        ))}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                    <span className="text-gray-600">
-                      {selectedStyle.popularity}% popularity rating
+                  <div>
+                    <h4 className="text-sm font-semibold text-[var(--foreground)] mb-2">
+                      Maintenance Level
+                    </h4>
+                    <span
+                      className={`inline-block px-3 py-1.5 rounded-lg text-sm font-medium border ${getMaintenanceColor(
+                        selectedStyle.maintenance_level
+                      )}`}
+                    >
+                      {selectedStyle.maintenance_level.charAt(0).toUpperCase() +
+                        selectedStyle.maintenance_level.slice(1)}{" "}
+                      Maintenance
                     </span>
                   </div>
                 </div>
 
-                <div className="mt-6 pt-4 border-t">
-                  <Link href="/consultation">
-                    <Button className="w-full">Use This Style in Consultation</Button>
+                <div className="mt-8 flex gap-3">
+                  <button
+                    onClick={() => toggleFavorite(selectedStyle.id)}
+                    className="flex-1 btn-secondary flex items-center justify-center gap-2"
+                  >
+                    <Heart
+                      className={`w-4 h-4 ${
+                        favorites.includes(selectedStyle.id) ? "fill-current" : ""
+                      }`}
+                    />
+                    {favorites.includes(selectedStyle.id) ? "Saved" : "Save Style"}
+                  </button>
+                  <Link
+                    href="/consultation"
+                    className="flex-1 btn-primary flex items-center justify-center gap-2"
+                  >
+                    Use in Consultation
                   </Link>
                 </div>
               </div>
